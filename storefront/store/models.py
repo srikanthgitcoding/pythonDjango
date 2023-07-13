@@ -1,9 +1,9 @@
-from django.db import models
+from django.db import models 
 import uuid
 from django.conf import settings #cup2
 
 # Create your models here.
-class Promotion(models.Model):
+class Promotion(models.Model): 
     description = models.CharField(max_length=255) 
     discount = models.FloatField() 
     #product_set - that return all the prodcust that applied to
@@ -16,7 +16,8 @@ class Collection(models.Model):
     def __str__(self) -> str:  
         return self.title
 
-class Product(models.Model):
+class Product(models.Model): # models is module and Model is a class
+    
     title = models.CharField(max_length=255)
     slug =  models.SlugField()#slug 
     description = models.TextField(null=True,blank=True)
@@ -25,6 +26,10 @@ class Product(models.Model):
     last_update = models.DateTimeField(auto_now=True)
     collection = models.ForeignKey(Collection,on_delete=models.PROTECT,null=True)#12
     promotions = models.ManyToManyField(Promotion)#p
+    
+    # model object keys are class names with PascaelCase models.CamelCase ex # models.Model
+    #all the keys with datatype ends with "Filed" models.CharFiled and so on
+    #inside the Filed all key are seperated by underscore
 
     # def __str__(self) -> str:
     #     return self.title
@@ -51,7 +56,7 @@ class Customer(models.Model):
     MEMBERSHIP_SILVER = "S"
     MEMBERSHIP_GOLD = "G"
 
-    MEMBERSHIP_CHOICES= [
+    MEMBERSHIP_CHOICES= [ 
         (MEMBERSHIP_BRONZE, "Bronze"),
         (MEMBERSHIP_SILVER, "Silver"),
         (MEMBERSHIP_GOLD, "Gold"),
@@ -122,7 +127,7 @@ class Review(models.Model):
 #10 - what should happen when customer deleted 
 ## on_delete = models.CASCADE - when we delete customer the associated address also will be deleted this is the cascade behaviour
 ## on_delete = models.SET_NULL - if this filed accepts null values - ewhen the customer gets deleted this fileds will be set to null value
-## on_delete= models.PROTECT - models.PROTECT - with this we can prevent the deletion if there is a child associated with this parent we cant delete that parent first we have to dlete the child
+## on_delete= models.PROTECT - models.PROTECT - with this we can prevent the deletion if there is a child(address) associated with this parent(customer) we cant delete that parent, first we have to dlete the child
 ## which values we use it depends on the requirement 
 ## primary_key = true - primary kjey dont allow duplicate values
 ## if we dont set pk here jango will create asnother field called id and evert addees ius gonna hgave an id that means we gonna ebnd up one to many relationship
@@ -158,3 +163,15 @@ class Review(models.Model):
 #15 we use indeing to speed up our queries
 
 #noew  when we create review object the fata auto populates
+
+
+
+
+class Collection1(models.Model):
+    name = models.CharField(max_length=25)
+
+class Product1(models.Model):
+    pname = models.CharField(max_length=30)
+    collectionID = models.ForeignKey(Collection,on_delete="models.CASCADE")
+
+class  

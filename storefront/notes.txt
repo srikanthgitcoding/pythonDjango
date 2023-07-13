@@ -22,43 +22,9 @@
 relation ship bw entitles 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-cockies ? in flipkart when u add product to cart without login and next time when u come it stores all data u have added in cookies when u clear cookies and refresh page the carts which u added will be gone
-
-
-
-
-
-
-
 MIGRATIONS
 ————————
-In jango project we r not gonna create and modify db objects - we gonna let hang tc of that 
+In jango project we r not gonna create and modify data base objects - we gonna let django take care of that 
 run - python manage.py makemigrations - 
  - first django looked at all the installed apps in the project and for each app it created a new migration file
  - evrytime u create a new model run python makemigrations command
@@ -352,7 +318,218 @@ JSOn web token -
     we dont need an extra db call 
     here u get 2 tokens(refresh token(1 day) and access token(lifetime =5))    
 
+keeps notes
+-----------
 
+IMPORTANT"
+---------------------
+1) whenevr u create or make change sto moldel always make migration
+2) Building the model -  create model, create migrations(py manage.py makemigrations ), apply migrations(py mange.py migrate )
+3) Building the API -   create serializer class, create view , register a route 
+
+RESOURCES -  URL (unified resource locator)-
+----------------------------------------
+
+assume our websire is hosted at www.example.com - in order to access its resources www.example.com/products - u can access individual resources www.example.com/products/1 
+www.example.com/products/1/resource/1 - nested resource (it sholnt be nested most than 2 levels else URLs gets complex and un managable)
+- here products/1 - referencing to a singles product 
+
+RESOURCE REPRESENTATION -  when u hit a URL the server returns the resource in a certain format or representation 
+- html
+- XML(old way)
+- json (modern format)
+- client has representation in what format they need HTML,XML,json 
+
+HTTP METHODS:
+-----------------------------
+
+1) each end point supports/allows various kinds of operations like get post,put delete,patch(some endpoints may allow only reading data some allow modifying data)
+if u want to update all properties use put 
+if u want update a subset of it use patch  
+
+WHAT IS DIFF BW AUTHENTICATION AND AUTHORIZATION      :
+-----------------------------------------------------------------------------------------------------
+
+Authentication : is the process of verifying who a user is, and 
+authorization : is the process of verifying what they have access to.
+
+WHAT IS CELERY : 
+------------------------------
+long running tasks:
+in almost evry application we have resource intensive tasks such as
+
+1) processing images and videos 
+2) generating reports
+3) sending emails
+4) running machine learning models and 
+
+we dont want run this tasks that runs inside our application 
+
+say user uploads a video we dont want to process that inside a main application process and have the user wait untill we r done 
+instead we gonna take the procees runs in the background and quickly get back to user we r processing video and when it is done u say ur video is ready 
+
+we can do this using a tool caled celery , with celery u cn start several workers to execute the taks in the bg so whenevr u want execute a long running task,
+
+each workers pick a task from queue and excutes it, it doesnt effect main app if workers fails 
+
+MODEL SERIALISERS -
+-----------------------
+ There r two ways u can convert model data to json 
+ Using serilazers.serializer
+ 2. Model SERIALISERS
+ 1. inherit serializers.ModelSerializer 
+ 2. Add class meta
+ 3. Model = model name ( product)
+ 4. Add the fields required to show in the json( fields = []) 
+ 5. To created ur own fileds inherit serializers SerializeMethodFiled( method_name=calculate)
+
+DESERIALIZING OBJECTS- 
+-------------------------
+
+It works exactly opposite to serialization
+
+Say u send a post request to sever by adding user details, ideally a object, now u have to convert this to python object and store it in db? How we gonna do that ? Using DESERIALIZING
+
+1. User send request
+2. Check if post request( point to remember here the API we create can be, get r post based on what we allow in decorator api_view[get,post] when add this, in UI u can see a form with post button and this is bcz of restframework api
+3. Serializername(data(set data keyword arg)= request.data)
+
+DATA VALIDATION  :
+---------------------------------
+In above post request, user sends an empty object in that case we have to validate, and can be done after converting user request data to serializater
+
+SAVE DATA:
+---------------------
+we have a modelSerializer class, this can be inherited inside serializer class
+like class ProductSerializer(serializers.ModelSerializer) and it has save method( serializer.save() ) it creates a new product or updates a existing product - try to send a post request and request body accepts 5 objects {a,b,c,d,e},
+however, u have sent 3 objects {a,b,c} here u get a INTEGRITY ERROR (column cant be null, which means u have add d and e to the post request)
+so ensure to pass all mandatory fields u set in model class in request body.
+first fetch request data(whatever user sent) and deserialize it (convert it into python object)and validate it(check if any fields missed out)  and save it to db(in this case we have one more option that is overriding this save method, this save method persist in model serializer class and u over ride it(def create and update internally save method calls create or update method) and add ur logic there say u want to add datetimefiled in that at that time of creattion)
+
+DELETE OBJECTS:
+------------------------------
+
+to get delete button in browsable APIor UI (add delete tp api_view decorator)
+
+CLASS BASED VIEW :(makes code cleaner and concise)(21)
+---------------------------------
+class based views provides lot of reusable opportunities 
+import API view from restfrmaework
+class ClassName(inheritAPIView):
+def get(self,request,id)
+def post(self,request,id)
+in URL - add as_view() - productClassName and it has a method as_view() - this method converts it to regular fn based view
+MIXINS
+------------
+In general very class has get,post method
+(say product list and collection list) - 
+in case of get - get data from db which is query set and serialize it(so that can be understood by front end language) and send it 
+in case of post - get request data and deserialize it (can be understood by python) and validate the data and save it and send response
+
+this logic is common for all the get post delete update request that's when mixins come into picture
+
+we have  -
+LIstModelMixin CreateModelMixin retriveModelMixin Update Destroy
+
+GENERIC VIEWS(23):(when u add generic views in UI it adds raw data with form(firstname in form ) and json data with filed switch empty values {"fristname:""})
+
+most of the time we don't use these mixins directly instead we gonna use concrete view classes(CREATEAPIVIEW, ListAPIView,) that combines one or more mixins we call this classes generic views 
+
+generic has built in methods for query set and serializing data
+
+u can use queryset and serializer_class properties incase u have no logic to write
+if u have logic to to write in query set or serializer_class use 
+
+get_queryset() and get_serializer_class() , get_serilizer_context() methods
+
+CUSTOMIZING GENERIC VIEWS"- 24
+-----------------------------------------------------
+how to customize the generic views -  by default it has same logic if u have ur own logic u overide the method and write
+
+VIEW SETS - set of related views()
+---------------------
+
+if u see product view class there are 2 classes for product list(all products and post) and product details(individual product and modify and delete)
+
+class ProductList(CreateRetreiveAPIViews):
+queryset =""
+serializer ="product
+class ProductList(UpdateDeleteAPIView):
+queryset = product.objects.all()
+serializer ="product
+
+in this case we r repeating the code we can avoid the above using view sets
+
+class ProductVIewSet(ModelViewSet)"" - look at the className
+queryset =""
+serializer ="product
+ModelViewSet - with this we can do all operations listing updating deleting creating
+
+ReadOnlyModelViewSet - with this u can only do read no update delete create
+Here we r turning 2 classes(detail and list) to one (productList)
+with viewsets routing changes 
+
+Auth engines
+_______________
+
+1) token based authentication( built in django restframework, uses a db table to store tokens so every time we receive a request on the server bro validate token it is gng to backend data base and ensures it is valid token that requires a data base call for every request)
+2) json web token authenticationor jwt token (implemented ina seperate library and this doesn't need a data base call )
+
+Securing APIs
+________________
+
+Token based authentication
+For authenticating users with restful APIS
+
+Say - new user is gonna use our application first they need to register and on their machine the client app is gonna send a req to users endpoint
+Here on server will capture user name pass name email and create a new account for them
+Next user needs to login so the client app needs to send a request to authentication end point by passing user credentials (un and password) to server, on server we will validate the user credentials if they r not valid we gonna return an error else will return a token , this token is a temporary key we gonna give to  client to access protected resources so the client is gonna store this in local storage, next time when needs to access protected resources this gong bro be send it to server,
+Let's stay user request profile end point on server we will read the token validate it if it valid and not expired we gonna give access to this resource else will return an error
+
+
+Auth system 
+______________
+Use Djoser restful implementation of django authentication system
+Provides bunch of views for registration login logout password reset and so on
+
+Inspecting JSON WEB Token
+--------------------------------------------------
+it contains 
+header - type (jwt) and algo -(algorithm)
+payload - username email usr id oris  token(access or refresh)it access token or refresh token
+signature - header + paylod  generated based on both - the sign nature has to be re generated if we change payload 
+signature has to pass with server stored signature
+
+ACCESS TOKE AND REFRESH TOKEN
+-----------------------------------------------------
+when we login we get 2 tokens access (valid 5 min by defal)and refresh (valid 1 day be default)
+whenacces token expires client need to call refresh endpoint  to get new access token
+
+
+SMTP SERVER (simple mail transfer protocol)
+-----------------------------------------
+fake smtp server (smtp4dev)
+
+
+RESPONSE STATUS: (httpstatuses.com)
+---------------------------------
+404 - NOT FOUND , THE URL u try to hit doesn't exist
+201 created - when u post a request with data and it saves successfully in db then u get 201 status(note : when ur end point creates new resource it should send a response with 201 status and the the object that is being created)
+
+204- when u delete a resource u send HTTP 204 no content 
+
+405 - when the method is not allowed (get post delete not allowed on specific URL)
+400 - BAD request - 
+expected request body - { a:"" , b : "", c : " "}
+- but given - {a:" "}
+- 401 - unauthorised (no token or toke expired)
+- 403 - forbidden 
+
+
+
+IMPORTS notes
+---------
+from django.db import models (from django.db package import models) 
 
 
 
