@@ -1,3 +1,61 @@
+1) what is migration folder in django?- this is used to generating data base tables
+2) why model class? - we used models to pull out data from data base and present to user 
+3) what test file ?- to write unit tests
+4) viwes module? - its a request handler 
+5) what should we need after creating an app? - as soon as u create an app u need to register inside setting file installed apps sesction
+6) what is db.sqlite3 ? - it default database engine can be used for small projects or low traffic 
+7) django-admin startproject storefront .(add period at the end to not create extra folder)
+8) __init__ ? this defines this directory as a package
+9) settings modulle ? to define application settings 
+10) urls - we deine urls of our application
+11) asgi and wsgi - used for deployment
+12) what is django.contrib.admin - this is admin app which gives un admin interface for manageing data
+13) django.contrib.aut - used for authenticating user 
+14) django.contrib.sessions - it is tempaerory memory on the server for manageing users data  (we dont use this anymore)
+15) django.contrib.staticfiles - used to serve static files such as images css and so on(all thes apps provides certain pices of functionality)
+16) what is http?- request response protocol
+17) what is you have 18 unapplied migraions- ?
+18) debugging need to see (lesson 14) what is launch.json - to debug django application vs code creates this file under vs code folder 
+19) what are models - 
+20) data models? - data models can be 1-1 ,1- *, * - *
+21) Ecommer data model - in diagarom if u see (----) to represent relation it is called assosication class, half moon
+relation ship bw entitles 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+cockies ? in flipkart when u add product to cart without login and next time when u come it stores all data u have added in cookies when u clear cookies and refresh page the carts which u added will be gone
+
+
+
+
+
+
+
 MIGRATIONS
 ————————
 In jango project we r not gonna create and modify db objects - we gonna let hang tc of that 
