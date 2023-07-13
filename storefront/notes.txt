@@ -1,0 +1,338 @@
+MIGRATIONS
+————————
+In jango project we r not gonna create and modify db objects - we gonna let hang tc of that 
+run - python manage.py makemigrations - 
+ - first django looked at all the installed apps in the project and for each app it created a new migration file
+ - evrytime u create a new model run python makemigrations command
+ - if create new model it creates migration file with - migrations.CreateModel
+ - if u renmae field name the operation would be - migrations.RenameField
+ - if u add new filed to existing model -  migrations.AddField(
+
+RUNNING MIGRATIONS
+-------------------
+now e have migrations (it is like commit in the  git now we have to push the changes)
+now run these migrations to generate databse schema - python manage,py migrate
+
+UNDO MIGRATIONS
+-----------------
+if we have done lot of changes and rever onely one filed name change u can remove that 
+However if u want to revert entire last migrations to prevbious one -
+
+python manage.py migrate store 0003 - the app name n migrations number 
+and remove code which was added and the associated migrations file
+
+1) to revert db migrations  - python manage.py migrate store 0004 (give th migration number)
+2) after this u still have to remove changes manually from the code and delete the migrations file as well
+to remove completly
+3) if u remove the files first the db cant be reverted 
+4) if u delete migrations file and not the code next time u run the migrate it will re create the migration file
+5) 
+
+what is ORM ? what problem thet try to solve?
+ in relation data base the data is stored as rows in tables
+when pulling up daya from relational db we need map these rows into objects 
+orms doesnt perform well when delaing with complex queries
+
+django manager and query sets
+------------------------------
+
+
+MYSQL CLIENTS
+-------------
+mysql workbench(free)
+
+
+Defeering fileds
+----------------
+there is another technique to fetch the rows we want like values ()
+only () - we can specify the fileds we want from db 
+ex - product.object().onlu("firstname","lastname") - 
+return type - instance of product class
+while looping if u fetch data which doesnt exist 
+say firstname for each loop it will excute one sql query(u will end up sending lot of queries)
+defer() - with this we can defer loading of certain methods to later
+say u want all the fileds in table except one 
+query_set = Product.objects.defer("description")
+now if u try to fetch description in loop for each iternation it sends a query
+
+query set Object
+-----------------
+query_set = Product.objects.values("title","description")[0:1] 
+values return type - dictionry objects
+query_set - <QuerySet [{'title': 'Bread Ww Cluster', 'description': 'mus vivamus vestibulum sagittis sapien cum sociis natoque penatibus et magnis dis parturient montes nascetur ridiculus'}]>
+
+only methods return type
+-------------------------
+query_set = Product.objects.only("title","description")[0:1]
+query_set <QuerySet [<Product: Product object (1)>]>
+while looping if u fetch data which doesnt exist 
+say firstname for each loop in will excute one sql query(u will end up sending lot of queries)
+
+selecitn related objects( select_related (1) )-return type query set
+------------------------
+query_set = Product.objects.select_related('collection').all()
+we use sr when the other end of relationship has one instance like product has one collection
+qs= Product.objects.all() - in this case u get all the product data and related table id and not gonna query 
+related tables 
+if u want preload products with collection use before we call all()
+call select_related(table name)
+
+but if u try to access related table fileds such as tiltle 
+qs.collection.title - here u end up sending lot of queries
+to fix this use select_related method by passing table name
+qs = product.objects.select_related("filed name").all()
+
+prefetch_related(n): ->return type query set - when the other end of relationship has many objects
+----------------
+query_set = Product.objects.prefetch_related('promotions').select_related('collection').all()
+
+in this example a product can have many promotions
+
+REST API
+----------
+in django we have 2 classes
+1) httpRequest
+2) HttpResponse 
+from django.http import HttpResponse
+def sample(request):
+   return HttpResponse("ok")
+
+django restframeowrk alos comes with 2 classes
+1) request
+2) Response 
+these classes are simpler and more poerweful than that comes in django
+from testframework.decorators imoport api_view (decoratpr)
+from rest_framework.response import Response (class)
+thre are 2 changes 1) applied apiview decorator changes http respons eto response
+
+@api_view()
+def sample(request):
+   return Response("ok")
+
+serializer
+------------
+converts a model instance(product object) to a dictionary
+
+creating custom serializer fileds
+----------------------------------
+
+what if u have table with firstname lastname and salary 
+
+what if u want to show one more filed say double salary in the respons object 
+
+so in serilazer create this new filed 
+
+generic views
+--------------
+
+
+
+inheritance
+-----------
+it prevents code duplication and allows us to reuse code 
+
+-----------------------
+Expected view CollectionDetailClass to be called with a URL keyword argument named "pk". Fix your URL conf, or set the `.lookup_field` attribute on the view correctly.
+to fix this issue in 2 ways 
+    path('productsClass/<int:id>', views.ProductDetails.as_view()), # this calss has a method called as_view()
+change id to pk
+    path('productsClass/<int:pk>', views.ProductDetails.as_view()), # this calss has a method called as_view()
+
+    or add a lokk up filed in the partcula tviree class 
+    lookup_field = "id"
+
+mixins
+------
+
+we have mixins like create list retreive update destroy - instead of usinf these we use concrete classes 
+which combines one or more mixins
+generc view is a concrete class that combines one or more mixins nad provide u handlers like get post put delete
+
+ex - 
+nested routers
+----------------
+
+
+13. Serialising relationships
+---------------------------------------
+when we are returning a product we can include a related object or field like collection 
+there r few ways we can do it 
+1) primary key  #SRPK
+2) string 
+3) nested objects 
+4)hyperlink
+
+1) import the collection class from models module
+2) collection = serialisers.PrimarykeyrelatedFiled( queryset=collection.objects.all())
+
+how to provide DDITION DATA TO SERIALIZER USING CONTEXT OBJECT
+
+filtering
+------------
+
+http://localhost:8000/store/products?collection_id=3 
+
+what if I want to filter collection =3 aproducts 
+
+generic filters
+-----------------
+
+pip install django-filter
+
+
+31. Searching
+--------------
+u have list of data where i u want to search or filter it using whatever u type
+
+32. sorting 
+-------------
+
+
+Operatrions
+-----------
+
+method - what method grt post put 
+url - url 
+request - request 
+response 
+
+--------------------
+
+psycopg2.errors.UndefinedTable: relation "store_cart" does not exist
+------------------------------------------------------------------------
+1) python manage.py migrate --fake APPNAME zero
+2) python manage.py migrate APPNAME
+
+django.db.utils.ProgrammingError: relation "store_collection" already exists
+-----------------------------------------------------------------------------
+
+clear data in db-- DELETE FROM store_cart
+
+
+------------------
+class ModelA(models.Model):
+    pass
+
+class ModelB(models.Model):
+    a = ForeignKey(ModelA)
+
+ModelB.objects.select_related('a').all() # Forward ForeignKey relationship
+ModelA.objects.prefetch_related('modelb_set').all() # Reverse ForeignKey relationship
+
+---------------------------------
+
+dajngo autghentication
+------------------------
+
+in setting file - django.contrib.auth - this is the wuthentication sysytem 
+using this we can identify users  we cna alliow them to login logout change password and so on
+
+in this app we have bunch of models like - user group and permisssion and table for persisting these models 
+
+in this module ther is another section called middleware - 
+
+a middle is function it takes a request and it either passes that request to the nect middle ware or treturn response. 
+in jango when u recive a request, at soime piint that request is gonna passed to a view during this time jango 
+is gonna run  that request throught these middle wate function in order 
+each middle adds something to the reques t if any of the middle ware retun response the next middle ware is not gonna exute 
+
+we have authentication middle ware - the job of this middle ware is to reacd the users information from the request and 
+set the user attribute on the request object 
+
+class sampleView(ModelViewSet):
+def get_query_set(self):
+    self.request.user = this sets to anonimous ir actual user this is the job of authentication middleware 
+
+customising the user model:
+----------------------------
+
+what is u want to store additional data in django auth-user table ?
+here we havbe 2 Operatrions 
+1) using inhertiance - extend user  model
+
+class Appuser(User):
+    pass
+
+2) create a profile 
+
+create profile model in this model we have one to oine link to the user model (here we r noit using inheritance we r using composition)
+
+when should we use which approach?
+-------------------------------
+in first approach we have to inhertiance (use only for storing attributes related to authentication )
+in second approach we can create our own model and have forein key relationship to user model use only for storing non auth related to authentication )
+(user birthdate and address and so on)
+
+creating user profiles  #cup 1
+----------------------- 
+
+1) user = models.OneToOneFiled(Setting.AUTH_USER_MODEL,o)
+
+annotate objects:
+----------------
+sometimes we want to add  additional attributes to our objects while we query them
+this is where we use the annotate  
+
+print("----", Product.objects.annotate(is_new=True)) # error - QuerySet.annotate() received non-expression(s): True.
+#in place of boolean value we need to pass an exprefssion 
+in django we have expression class which is base class of all type of expression 
+it has 
+1) value 
+2) F - using F objects we can referece fileds
+3) Func - for calling db functions 
+4) Aggregate 
+
+Func Expression - say u want to concat first and lastName and send as fullname use Func expression
+
+1) what is authentication - (token based authentication and JSON web token authentication)
+ - sA de facto standard for authenticating users with restful APIS
+2) inspecting a jso web token - 
+
+token based authentication - 
+    validating a token needs a db call 
+JSOn web token - 
+    we dont need an extra db call 
+    here u get 2 tokens(refresh token(1 day) and access token(lifetime =5))    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
