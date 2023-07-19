@@ -27,7 +27,7 @@ class Product(models.Model): # models is module and Model is a class
     collection = models.ForeignKey(Collection,on_delete=models.PROTECT,null=True)#12
     promotions = models.ManyToManyField(Promotion)#p
     
-    # model object keys are class names with PascaelCase models.CamelCase ex # models.Model
+    # models modules has class names with PascaelCase models.PascalCase ex # models.Model
     #all the keys with datatype ends with "Filed" models.CharFiled and so on
     #inside the Filed all key are seperated by underscore
 
@@ -174,4 +174,3 @@ class Product1(models.Model):
     pname = models.CharField(max_length=30)
     collectionID = models.ForeignKey(Collection,on_delete="models.CASCADE")
 
-class  

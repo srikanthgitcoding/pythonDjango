@@ -20,6 +20,51 @@
 20) data models? - data models can be 1-1 ,1- *, * - *
 21) Ecommer data model - in diagarom if u see (----) to represent relation it is called assosication class, half moon
 relation ship bw entitles 
+22) what is manager object? - every model in django has an attribute called objects and this returns a manager object and provides few methods for querying or updating data
+23) what is lookup type - gt lt gte lte range
+managers and querysets (product model class)
+24) what is related fileds - other tables relationships(in product table collection is a related table- look in product model)
+
+-----------------------
+all the below methods return s a query set( <QueryDict: {'collection_id': ['3']}>) 
+
+how to evaluvate this qs - 1) for loop 2) convert to list ' list(qs) ' 3)qs[0] 
+1) product.objects.all() - for pulling out all the data from products table 
+2) product.objects.get() - for getting single object from products table 
+    product.objects.get(id=1),product.objects.get(pk=1)(it throws exception if id=1 doesnt exist)
+3) product.objects.filter() - for filtering data from products table 
+4) product.objects.count() - for getting count of products table (it doenst return a qs it return the count directy)
+5) product.objects.filter(pk=1).first() - filtermethod return qs and fetch first object it retunr none if it doent find 
+6) product.objects.filter(pk=1).exists() - returns boolean value 
+7) product.objects.filter(unit_price=20) - get prosucts whose unit price is 20 
+8) product.objects.filter(unit_price__lt or lte or gt or gte = 20 or range=(20,30))  - get prosucts whose unit price is > or < or >= or <= use (u cant use logical operators directly instead use look up types lik range)
+9)product.objects.filter(unit_price__range=(20,30)) - get unti price range bw 20 to 30 
+10) product.objects.filter(collection__id__range=(20,30)) - filter across relation ships(one to one or one to many)
+11) product.objects.filter(title__contains="coffee")- search for title coffee , look up type with case sesntive
+12) product.objects.filter(title__icontains="coffee")- search for title coffee , look up type with case in sesntive
+13) product.objects.filter(title__startwith="coffee")- search for title starts with coffee , look up type with case in sesntive
+14) product.objects.filter(title__endwith="coffee")- search for title ends with coffee , look up type with case in sesntive
+15) product.objects.filter(description_isnull=true)- get all records where desc is null 
+
+complex look ups using Q(is short for Query) Objects
+------------------------------
+find all the producst whose inventory is < 2 and price is < 30 
+16) products.objects.filter(inventory__lt <2, unit_price <30)  - here the sql query will be 'AND' operator 
+17) products.objects.filter(inventory__lt < 2).filter(unitprice__lt<2) 
+what if I wanr an OR operator instead of AND
+18) products.objects.filter(Q(inventory__lt <2) | Q(unit_price < 30)) - OR condtion
+19) products.objects.filter(Q(inventory__lt <2) & Q(unit_price < 30)) - AND condition  - in this scenario u  may not need q Objects u can line 16,17 
+20) products.objects.filter(Q(inventory__lt <2) & ~Q(unit_price < 30)) - ~ NOT Operator (unit price not less than 30) 
+
+referencing fileds USING F Objects 
+___________________________________
+say u when u refer to a particular filed  and using F objects we can find a filed in related table(other table refernce) 
+21) prosucts.objects.filter(inventory = F('unitprice'))
+22) prosucts.objects.filter(inventory = F('collection__id')) - collection id should equal to inventory 
+
+
+
+
 
 
 MIGRATIONS
@@ -52,7 +97,7 @@ to remove completly
 4) if u delete migrations file and not the code next time u run the migrate it will re create the migration file
 5) 
 
-what is ORM ? what problem thet try to solve?
+what is ORM ? what problem thet try to solve? 
  in relation data base the data is stored as rows in tables
 when pulling up daya from relational db we need map these rows into objects 
 orms doesnt perform well when delaing with complex queries
@@ -127,7 +172,7 @@ django restframeowrk alos comes with 2 classes
 these classes are simpler and more poerweful than that comes in django
 from testframework.decorators imoport api_view (decoratpr)
 from rest_framework.response import Response (class)
-thre are 2 changes 1) applied apiview decorator changes http respons eto response
+there are 2 changes 1) applied apiview decorator changes http respons eto response
 
 @api_view()
 def sample(request):
